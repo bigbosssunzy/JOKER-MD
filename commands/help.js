@@ -71,7 +71,7 @@ async function helpCommand(sock, chatId, message) {
 ┃🔰.groupinfo
 ┃⚙.staff or .admins 
 ┃🤡.vv 
-* 🎬.vv2
++🎬.vv2
 ┃🃏.trt <text> <lang>
 ┃📸.ss <link>
 ┃🤡.jid
