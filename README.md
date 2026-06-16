@@ -1,4 +1,3 @@
-
 # 🤖 JOKER-MD
 
 This is a WhatsApp bot built using the Baileys library for group management, including features like tagging all members, muting/unmuting, and many more. It's designed to help admins efficiently manage WhatsApp groups.
@@ -36,17 +35,36 @@ Click the button below to fork the JOKER-MD repository to your GitHub account:
 
 ---
 
-### Step 2: Get Pair Code
+### Step 2: Deploy Now
 
-Deploy the bot and easily connect it to your WhatsApp account by pair code. 
+<div align="center">
+  <a href="https://bot-hosting.net/?aff=1068419752923508776">
+    <img src="https://img.shields.io/badge/Deploy on Panel-28a745?style=for-the-badge" alt="Deploy on Panel"/>
+  </a>
+</div>
 
-### After getting the creds.json file, upload it to the `session/` folder.
+### Deploy on VPS
 
----
+<div align="center">
+  <a href="https://client.petrosky.io/aff.php?aff=394" target="_blank">
+    <img src="https://img.shields.io/badge/petrosky vps-0078E7?style=for-the-badge" alt="petrosky vps"/>
+  </a>
+</div>
 
-### Step 3: Deploy Now
+### Deploy on Below Panel
+<div align="center">
+<a href="https://dashboard.katabump.com/auth/login#d6b7d6" target="_blank">
+  <img src="https://img.shields.io/badge/Katabump-D6B7D6?style=for-the-badge&logo=server&logoColor=black" alt="Katabump"/>
+</a>
+</div>
 
-For further customization and setup guidance, clone your repository or host it on your chosen VPS / Hosting panel.
+### Join Us
+
+<div align="center">
+  <a href="https://whatsapp.com/channel/0029VbCxwJeEgGfFhMx4zg3q">
+    <img src="https://img.shields.io/badge/Join%20WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Join WhatsApp"/>
+  </a>
+</div>
 
 ---
 
@@ -81,20 +99,20 @@ It is lightweight and can be easily customized to add more commands as per your 
 
 1. **Clone the repository:**
 
-```bash
+    ```bash
     git clone [https://github.com/bigbosssunzy/JOKER-MD.git](https://github.com/bigbosssunzy/JOKER-MD.git)
     cd JOKER-MD
     ```
 
 2. **Install the dependencies:**
 
-```bash
+    ```bash
     npm install
     ```
 
 3. **Run the bot:**
 
-```bash
+    ```bash
     node main.js
     ```
     *(Note: If your file configuration points primarily to index.js, use `node index.js` instead)*
@@ -165,3 +183,5 @@ Copyright (c) 2026 bigbosssunzy. All rights reserved.
 This project contains code from various open source projects:
 - Baileys (MIT License)
 - Other libraries as listed in package.json
+
+```
