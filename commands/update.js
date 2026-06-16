@@ -50,7 +50,7 @@ function downloadFile(url, dest, visited = new Set()) {
             const client = useHttps ? require('https') : require('http');
             const req = client.get(url, {
                 headers: {
-                    'User-Agent': 'KnightBot-Updater/1.0',
+                    'User-Agent': 'JokerBot-Updater/1.0',
                     'Accept': '*/*'
                 }
             }, res => {
@@ -127,10 +127,9 @@ function copyRecursive(src, dest, ignore = [], relative = '', outList = []) {
 }
 
 async function updateViaZip(sock, chatId, message, zipOverride) {
-    const zipUrl = (zipOverride || settings.updateZipUrl || process.env.UPDATE_ZIP_URL || '').trim();
-    if (!zipUrl) {
-        throw new Error('No ZIP URL configured. Set settings.updateZipUrl or UPDATE_ZIP_URL env.');
-    }
+    // Default fallback pointing straight to your repository
+    const zipUrl = (zipOverride || settings.updateZipUrl || process.env.UPDATE_ZIP_URL || 'https://github.com/bigbosssunzy/JOKER-MD/archive/refs/heads/main.zip').trim();
+    
     const tmpDir = path.join(process.cwd(), 'tmp');
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
     const zipPath = path.join(tmpDir, 'update.zip');
@@ -139,7 +138,7 @@ async function updateViaZip(sock, chatId, message, zipOverride) {
     if (fs.existsSync(extractTo)) fs.rmSync(extractTo, { recursive: true, force: true });
     await extractZip(zipPath, extractTo);
 
-    // Find the top-level extracted folder (GitHub zips create REPO-branch folder)
+    // Find the top-level extracted folder (GitHub zips create JOKER-MD-main folder)
     const [root] = fs.readdirSync(extractTo).map(n => path.join(extractTo, n));
     const srcRoot = fs.existsSync(root) && fs.lstatSync(root).isDirectory() ? root : extractTo;
 
@@ -200,24 +199,20 @@ async function updateCommand(sock, chatId, message, zipOverride) {
     }
     try {
         // Minimal UX
-        await sock.sendMessage(chatId, { text: '🔄 Updating the bot, please wait…' }, { quoted: message });
+        await sock.sendMessage(chatId, { text: '🔄 Updating JOKER-MD, please wait…' }, { quoted: message });
         if (await hasGitRepo()) {
-            // silent
             const { oldRev, newRev, alreadyUpToDate, commits, files } = await updateViaGit();
-            // Short message only: version info
             const summary = alreadyUpToDate ? `✅ Already up to date: ${newRev}` : `✅ Updated to ${newRev}`;
             console.log('[update] summary generated');
-            // silent
             await run('npm install --no-audit --no-fund');
         } else {
             const { copiedFiles } = await updateViaZip(sock, chatId, message, zipOverride);
-            // silent
         }
         try {
             const v = require('../settings').version || '';
             await sock.sendMessage(chatId, { text: `✅ Update done. Restarting…` }, { quoted: message });
         } catch {
-            await sock.sendMessage(chatId, { text: '✅ Restared Successfully\n Type .ping to check latest version.' }, { quoted: message });
+            await sock.sendMessage(chatId, { text: '✅ Restarted Successfully\n Type .ping to check latest version.' }, { quoted: message });
         }
         await restartProcess(sock, chatId, message);
     } catch (err) {
@@ -227,5 +222,3 @@ async function updateCommand(sock, chatId, message, zipOverride) {
 }
 
 module.exports = updateCommand;
-
-
