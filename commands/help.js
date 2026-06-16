@@ -109,6 +109,7 @@ async function helpCommand(sock, chatId, message) {
 ┃🤡.mode <public/private>
 ┃🃏.clearsession
 ┃🤡.antidelete
++🚫.antiviewonce
 ┃🃏.cleartmp
 ┃🤡.update
 ┃⚙.settings
