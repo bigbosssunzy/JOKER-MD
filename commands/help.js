@@ -23,12 +23,11 @@ async function helpCommand(sock, chatId, message) {
         const audioLink = "https://files.catbox.moe/l30hp5.mp3"; 
 
         // 2. Send the Video (via Link)
-        const botBio = `╔═══════════════════╗\n` +
-                       `   *🤖 ${settings.botName || '🤡𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧!🤡'}*\n` +
-                       `   Version: *${settings.version || '3.0.6'}*\n` +
-                       `   by ${settings.botOwner || '🦊⃟ᴠͥɪͣᴘͫ✮⃝🇧𝖎𝖌🇧ө͜͡ss𝄟⃝🎧™'}\n` +
-                       `╚═══════════════════╝\n\n` +
-                       `📶 *𝐒𝐭𝐚𝐭𝐮𝐬:* System Active\n` +
+        const botBio = `\n` +
+                       `🤖*Bot*:${settings.botName || '🤡𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧!🤡'}*\n` +
+                       `🤡*Version*:*${settings.version || '3.0.6'}*\n` +
+                       `⚓*Owner*:${settings.botOwner || '🦊⃟ᴠͥɪͣᴘͫ✮⃝🇧𝖎𝖌🇧ө͜͡ss𝄟⃝🎧™'}\n` +
+                       `📶*𝐒𝐭𝐚𝐭𝐮𝐬:* System Active\n` +
                        `🃏 _"Let's put a smile on that face!"_`;
 
         await sock.sendMessage(chatId, { 
@@ -51,47 +50,240 @@ async function helpCommand(sock, chatId, message) {
         // 4. Main Menu Text
         const menuText = `🃏 *【 🤡 𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧! 🤡 】* 🃏
 
-🎭 *𝙐𝙨𝙚𝙧:* ${message.pushName || 'User'}
-🤡 *𝘽𝙤𝙩:* 𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧!🤡😈
-👑 *𝙊𝙬𝙣𝙚𝙧:* 🦊⃟ᴠͥɪͣᴘͫ✮⃝🇧𝖎𝖌🇧ө͜͡ss𝄟⃝🎧™
+🎭*𝙐𝙨𝙚𝙧:* ${message.pushName || 'User'}
+🤡*𝘽𝙤𝙩:* 𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧!🤡😈
+👑*𝙊𝙬𝙣𝙚𝙧:* 🦊⃟ᴠͥɪͣᴘͫ✮⃝🇧𝖎𝖌🇧ө͜͡ss𝄟⃝🎧™
 
 ┎━━━〔 🌐 *𝙂𝙀𝙉𝙀𝙍𝘼𝙇* 〕━━━┈
-┃ 🃏 .help / .menu
-┃ 📡 .ping
-┃ 🎭 .alive
-┃ 🗣️ .tts
-┃ 👤 .owner
-┃ 👁️ .wow
+┃ 🤡.help or .menu
+┃🃏.ping
+┃🤡.alive
+┃🃏.tts <text>
+┃🤡.owner
+┃🃏.joke
+┃🤡.quote
+┃🃏.fact
+┃☁.weather <city>
+┃📜.news
+┃🤡.attp <text>
+┃🎵.lyrics <song_title>
+┃🃏.8ball <question>
+┃🔰.groupinfo
+┃⚙.staff or .admins 
+┃🤡.vv 
+* 🎬.vv2
+┃🃏.trt <text> <lang>
+┃📸.ss <link>
+┃🤡.jid
+┃📎.url
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━〔 👮‍♂️ *𝘼𝘿𝙈𝙄𝙉𝙎* 〕━━━┈
-┃ 📈 .promote
-┃ 📉 .demote
-┃ 🔇 .mute
-┃ 🔊 .unmute
-┃ 🥾 .kick
-┃ 🏷️ .tagall
+┃⚠.ban @user
+┃⚙.promote @user
+┃⚙.demote @user
+┃⚙.mute <minutes>
+┃⚙.unmute
+┃🚫.delete or .del
+┃🚫.kick @user
+┃⚠.warnings @user
+┃⚠.warn @user
+┃❌.antilink
+┃❌.antibadword
+┃⚙.clear 
+┃⚙.tag <message>
+┃⚙.tagall
+┃⚙.tagnotadmin
+┃👁.hidetag <message>
+┃🤖.chatbot
+┃⚙.resetlink
+┃❌.antitag <on/off>
+┃🤝🏼.welcome <on/off>
+┃👋🏼.goodbye <on/off>
+┃⚙.setgdesc <description>
+┃⚙.setgname <new name>
+┃⚙.setgpp (reply to image)
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━〔 🔒 *𝙊𝙒𝙉𝙀𝙍* 〕━━━┈
-┃ 🔑 .mode
-┃ 🧹 .cleartmp
-┃ 🔄 .update
-┃ ⌨️ .autotyping
-┃ 🚫 .pmblocker
+┃🤡.mode <public/private>
+┃🃏.clearsession
+┃🤡.antidelete
+┃🃏.cleartmp
+┃🤡.update
+┃⚙.settings
+┃⚙.setpp <reply to image>
+┃🎃.autoreact <on/off>
+┃✨.autostatus <on/off>
+┃🎈.autostatus react <on/off>
+┃💻.autotyping <on/off>
+┃✅.autoread <on/off>
+┃❌.anticall <on/off>
+┃✖.pmblocker <on/off/status>
+┃❌.pmblocker setmsg <text>
+┃⚙.setmention <reply to msg>
+┃⚙.mention <on/off>
 ┗━━━━━━━━━━━━━━┈
 
-┎━━━〔 🤖 *𝘼𝙄 𝘾𝙊𝙍𝙀* 〕━━━┈
-┃ 🧠 .gpt
-┃ ♊ .gemini
-┃ 🎨 .imagine
+┎━━━━━━━━━━━━━━━
+*Image/Sticker Commands*
+┗━━━━━━━━━━━━━━┈
+┎━━━━━━━━━━━━━━━
+┃🤡.blur <image>
+┃🃏.simage <reply to sticker>
+┃🤡.sticker <reply to image>
+┃🃏.removebg
+┃🤡.remini
+┃🃏.crop <reply to image>
+┃🤡.tgsticker <Link>
+┃🃏.meme
+┃🤡.take <packname> 
+┃🃏.emojimix <emj1>+<emj2>
+┃🤡.igs <insta link>
+┃🃏.igsc <insta link>
+┗━━━━━━━━━━━━━━┈ 
+
+┎━━━━━━━━━━━━━━━
+┃*Pies Commands*         ┃
+┗━━━━━━━━━━━━━━┈
+┎━━━━━━━━━━━━━━━
+┃🤡.pies <country>
+┃🇨🇳.china 
+┃🇮🇩.indonesia 
+┃🇯🇵.japan 
+┃🇰🇷.korea
+┃🃏.hijab
 ┗━━━━━━━━━━━━━━┈
 
-┎━━━〔 📥 *𝘿𝙊𝙒𝙉𝙇𝙊𝘼𝘿* 〕━━━┈
-┃ 🎧 .play / .song
-┃ 💾 .save (status)
-┃ 📸 .instagram
+┎━━━━━━━━━━━━━━━
+┃🎮 *Game Commands*┃
 ┗━━━━━━━━━━━━━━┈
+┎━━━━━━━━━━━━━━━
+┃🤡.tictactoe @user
+┃🃏.hangman
+┃🤡.guess <letter>
+┃🃏.trivia
+┃🤡.answer <answer>
+┃🃏.truth
+┃🤡.dare
+┗━━━━━━━━━━━━━━┈
+
+┎━━━━━━━━━━━━━━━
+┃🤖 *AI Commands*       ┃
+┗━━━━━━━━━━━━━━┈
+┎━━━━━━━━━━━━━━━
+┃🤖.gpt <question>
+┃🤖.gemini <question>
+┃🤖.imagine <prompt>
+┃🤖.flux <prompt>
+┃🤖.sora <prompt>
+┗━━━━━━━━━━━━━━┈
+
+┎━━━━━━━━━━━━━━━
+┃🎯 *Fun Commands*    ┃
+┗━━━━━━━━━━━━━━┈
+┎━━━━━━━━━━━━━━━
+┃🃏.compliment @user
+┃😎.insult @user
+┃😏.flirt 
+┃🤡.shayari
+┃🌌.goodnight
+┃🌹.roseday
+┃🃏.character @user
+┃☠.wasted @user
+┃⚓.ship @user
+┃🤡.simp @user
+┃🃏.stupid @user [text]
+┗━━━━━━━━━━━━━━┈
+
+┎━━━━━━━━━━━━━━━
+┃🔤 *Textmaker*              ┃
+┗━━━━━━━━━━━━━━┈
+┎━━━━━━━━━━━━━━━
+┃🤡.metallic <text>
+┃❄.ice <text>
+┃⛄.snow <text>
+┃👏🏼.impressive <text>
+┃💻.matrix <text>
+┃⭐.light <text>
+┃🃏.neon <text>
+┃😈.devil <text>
+┃🤡.purple <text>
+┃⚡.thunder <text>
+┃🃏.leaves <text>
+┃🤡.1917 <text>
+┃🃏.arena <text>
+┃💻.hacker <text>
+┃🤡.sand <text>
+┃🃏.blackpink <text>
+┃🤡.glitch <text>
+┃🔥.fire <text>
+┗━━━━━━━━━━━━━━┈
+
+┎━━━━━━━━━━━━━━━
+┃📥 *Downloader*            ┃
+┗━━━━━━━━━━━━━━┈
+┎━━━━━━━━━━━━━━━
+┃🎵.play <song_name>   
+┃🎶.song <song_name> 
+┃🎧.spotify <query>
+┃💽.instagram <link>
+┃📎.facebook <link>
+┃🎬.tiktok <link>
+┃🎬.video <song name>
+┃💾.ytmp4 <Link>
+┗━━━━━━━━━━━━━━┈
+
+┎━━━━━━━━━━━━━━━
+┃🧩 *MISC*                       ┃
+┗━━━━━━━━━━━━━━┈
+┎━━━━━━━━━━━━━━━
+┃❤.heart
+┃🤤.horny
+┃🤡.circle
+┃🃏.lgbt
+┃💂🏽.police
+┃🤡.its-so-stupid
+┃🃏.namecard 
+┃🤡.oogway
+┃🃏.tweet
+┃📜.ytcomment 
+┃⚔.comrade 
+┃🏃🏽.gay 
+┃🍸.glass 
+┃⛓.jail 
+┃🤡.passed 
+┃🔫.triggered
+┗━━━━━━━━━━━━━━┈
+
+┎━━━━━━━━━━━━━━━
+┃🖼️ *ANIME*                     ┃
+┗━━━━━━━━━━━━━━┈
+┎━━━━━━━━━━━━━━━
+┃🤡.nom 
+┃👉🏼.poke 
+┃😭.cry 
+┃💋.kiss 
+┃🤡.pat 
+┃🤡.hug 
+┃🤡.wink 
+┃🤡.facepalm 
+┗━━━━━━━━━━━━━━┈
+
+┎━━━━━━━━━━━━━━━
+┃💻 *Github Commands:*┃
+┗━━━━━━━━━━━━━━┈
+┎━━━━━━━━━━━━━━━━━
+┃➤ .git
+┃➤ .github
+┃➤ .sc
+┃➤ .script
+┃➤ .repo
+┗━━━━━━━━━━━━━━┈
+
+🔓 “Why so serious? We’re just rewriting the rules.”
+
+👻💻ʛʜө͜͡st ɪ͜͡ŋ tʜɘ ɱɛ͜͡cʜɪ͜͡ŋɘ🔓🔑👻
 
 🤡 *𝙅𝙊𝙆𝙀𝙍 𝙄𝙎 𝙒𝘼𝙏𝘾𝙃𝙄𝙉𝙂...*🤡`;
 
@@ -105,7 +297,7 @@ async function helpCommand(sock, chatId, message) {
 
         // 6. Channel Link
         await sock.sendMessage(chatId, { 
-            text: `https://whatsapp.com/channel/0029Vb7NnODATRSwT02OBR17/113`,
+            text: `https://whatsapp.com/channel/0029VbCxwJeEgGfFhMx4zg3q/100`,
             contextInfo: {
                 forwardingScore: 999,
                 isForwarded: true,
