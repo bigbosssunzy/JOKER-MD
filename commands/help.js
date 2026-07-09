@@ -284,8 +284,7 @@ async function helpCommand(sock, chatId, message) {
 
 🔓 “Why so serious? We’re just rewriting the rules.”
 
-👻💻ʛʜө͜͡st ɪ͜͡ŋ tʜɘ ɱɛ͜͡cʜɪ͜͡ŋɘ🔓🔑👻
-
+👻💻ʛʜө͜͡st ɪ͜͡ŋ tʜɘ ɱɛ͜͡cʜɪ͜͡ŋɘ💻👻
 🤡 *𝙅𝙊𝙆𝙀𝙍 𝙄𝙎 𝙒𝘼𝙏𝘾𝙃𝙄𝙉𝙂...*🤡`;
 
         // 5. Send Image with Menu
