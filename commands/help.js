@@ -54,7 +54,7 @@ async function helpCommand(sock, chatId, message) {
 🤡*𝘽𝙤𝙩:* 𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧!🤡😈
 👑*𝙊𝙬𝙣𝙚𝙧:* 🦊⃟ᴠͥɪͣᴘͫ✮⃝🇧𝖎𝖌🇧ө͜͡ss𝄟⃝🎧™
 
-┎━━━〔 🌐 *𝙂𝙀𝙉𝙀𝙍𝘼𝙇* 〕━━━┈
+┎━━━〔 🌐 *𝙂𝙀index.html𝙀𝙍𝘼𝙇* 〕━━━┈
 ┃ 🤡.help or .menu
 ┃🃏.ping
 ┃🤡.alive
@@ -282,32 +282,23 @@ async function helpCommand(sock, chatId, message) {
 ┃➤ .repo
 ┗━━━━━━━━━━━━━━┈
 
-🔓 “Why so serious? We’re just rewriting the rules.”
-
 👻💻ʛʜө͜͡st ɪ͜͡ŋ tʜɘ ɱɛ͜͡cʜɪ͜͡ŋɘ💻👻
-🤡 *𝙅𝙊𝙆𝙀𝙍 𝙄𝙎 𝙒𝘼𝙏𝘾𝙃𝙄𝙉𝙂...*🤡`;
+🤡 *𝙅𝙊k𝙀𝙍 𝙄𝙎 𝙒𝘼𝙏𝘾𝙃𝙄𝙉𝙂...*🤡\n\n*Join our channel for updates*!`;
 
-        // 5. Send Image with Menu
+        // 5. Send Image with Menu AND Attached Newsletter metadata
         await sock.sendMessage(chatId, { 
             image: { url: randomImg }, 
-            caption: menuText 
-        }, { quoted: message });
-
-        await delay(800);
-
-        // 6. Channel Link
-        await sock.sendMessage(chatId, { 
-            text: `https://whatsapp.com/channel/0029VbCxwJeEgGfFhMx4zg3q/100`,
+            caption: menuText,
             contextInfo: {
-                forwardingScore: 999,
+                forwardingScore: 1,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363388147926105newsletter',
+                    newsletterJid: '120363428288475430@newsletter', // Updated JID
                     newsletterName: '🤡𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧!🤡',
                     serverMessageId: 111
                 }
             }
-        });
+        }, { quoted: message });
 
     } catch (err) {
         console.error('❌ Menu Error:', err);
