@@ -13,24 +13,9 @@
       "value": ""
     },
     "OWNER_NUMBER": {
-      "description": "Your main WhatsApp number with country code (e.g., 911234567890). Do not add '+' or '-' spaces.",
+      "description": "Your main WhatsApp number with country code. Do not add '+' or '-' spaces.",
       "required": true,
       "value": "2347086057694"
-    },
-    "BOT_NAME": {
-      "description": "The custom name of your JOKER bot.",
-      "required": false,
-      "value": "🤡𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧!🤡"
-    },
-    "OWNER_NAME": {
-      "description": "Your custom name/handle displayed across the system panels.",
-      "required": false,
-      "value": "🦊⃟ᴠͥɪͣᴘͫ✮⃝🇧𝖎𝖌🇧ө͜͡ss𝄟⃝🎧™"
-    },
-    "MODE": {
-      "description": "Set whether the bot operates publicly or listens to you privately.",
-      "required": false,
-      "value": "public"
     }
   },
   "formation": {
