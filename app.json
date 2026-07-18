@@ -1,0 +1,54 @@
+{
+  "name": "JOKER-MD-BOT",
+  "description": "A powerful, feature-rich WhatsApp user bot built with the Baileys library.",
+  "keywords": ["whatsapp", "bot", "baileys", "joker", "multi-device", "js"],
+  "logo": "https://i.postimg.cc/hPz35s3c/menu1.jpg",
+  "repository": "https://github.com/bigbosssunzy/JOKER-MD",
+  "success_url": "/",
+  "stack": "container",
+  "env": {
+    "SESSION_ID": {
+      "description": "Put your Joker pairing session credentials or session ID folder here.",
+      "required": true,
+      "value": ""
+    },
+    "OWNER_NUMBER": {
+      "description": "Your main WhatsApp number with country code (e.g., 911234567890). Do not add '+' or '-' spaces.",
+      "required": true,
+      "value": "2347086057694"
+    },
+    "BOT_NAME": {
+      "description": "The custom name of your JOKER bot.",
+      "required": false,
+      "value": "🤡𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧!🤡"
+    },
+    "OWNER_NAME": {
+      "description": "Your custom name/handle displayed across the system panels.",
+      "required": false,
+      "value": "🦊⃟ᴠͥɪͣᴘͫ✮⃝🇧𝖎𝖌🇧ө͜͡ss𝄟⃝🎧™"
+    },
+    "MODE": {
+      "description": "Set whether the bot operates publicly or listens to you privately.",
+      "required": false,
+      "value": "public"
+    }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "eco"
+    }
+  },
+  "addons": [],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-static.git"
+    },
+    {
+      "url": "https://github.com/clhuang/heroku-buildpack-webp.git"
+    }
+  ]
+}
