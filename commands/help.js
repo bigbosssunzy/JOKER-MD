@@ -1,6 +1,7 @@
 const settings = require('../settings');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios'); // Ensure axios is installed in your package.json
 
 async function helpCommand(sock, chatId, message) {
     try {
@@ -8,8 +9,8 @@ async function helpCommand(sock, chatId, message) {
         await sock.sendMessage(chatId, { react: { text: '🤡', key: message.key } });
 
         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        
-        // 🖼️ Your Direct Image Links
+
+        // 🖼️ Direct Image Links for Random Selection
         const menuImages = [
             "https://i.postimg.cc/hPz35s3c/menu1.jpg",
             "https://i.postimg.cc/DzdNczpr/menu2.jpg",
@@ -18,16 +19,26 @@ async function helpCommand(sock, chatId, message) {
             "https://i.postimg.cc/c40rDkJF/menu5.jpg"
         ];
         const randomImg = menuImages[Math.floor(Math.random() * menuImages.length)];
-        
+
         const videoLink = "https://files.catbox.moe/hckn26.mp4"; 
         const audioLink = "https://files.catbox.moe/l30hp5.mp3"; 
 
-        // 2. Send the Video (via Link)
+        // Calculate System Performance
+        const uptimeSec = process.uptime();
+        const hours = Math.floor(uptimeSec / 3600);
+        const minutes = Math.floor((uptimeSec % 3600) / 60);
+        const seconds = Math.floor(uptimeSec % 60);
+        const uptimeStr = `${hours}h ${minutes}m ${seconds}s`;
+        const ramUsage = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2) + ' MiB';
+
+        // 2. Send the Video Banner
         const botBio = `\n` +
-                       `🤖*Bot*:${settings.botName || '🤡𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧!🤡'}*\n` +
-                       `🤡*Version*:*${settings.version || '3.0.6'}*\n` +
+                       `🤖*Bot*:${settings.botName || '🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡'}*\n` +
+                       `🤡*Version*:*${settings.version || '0.0.1'}*\n` +
                        `⚓*Owner*:${settings.botOwner || '🦊⃟ᴠͥɪͣᴘͫ✮⃝🇧𝖎𝖌🇧ө͜͡ss𝄟⃝🎧™'}\n` +
                        `📶*𝐒𝐭𝐚𝐭𝐮𝐬:* System Active\n` +
+                       `⏱️*Uptime:* ${uptimeStr}\n` +
+                       `💾*RAM:* ${ramUsage}\n` +
                        `🃏 _"Let's put a smile on that face!"_`;
 
         await sock.sendMessage(chatId, { 
@@ -38,23 +49,32 @@ async function helpCommand(sock, chatId, message) {
 
         await delay(1200); 
 
-        // 3. Send the Music
-        await sock.sendMessage(chatId, { 
-            audio: { url: audioLink }, 
-            mimetype: 'audio/mpeg', 
-            ptt: false 
-        }, { quoted: message });
+        // 3. Send Audio via Buffer (Fixes Playback Failures)
+        try {
+            const audioResponse = await axios.get(audioLink, { responseType: 'arraybuffer' });
+            const audioBuffer = Buffer.from(audioResponse.data, 'binary');
+
+            await sock.sendMessage(chatId, { 
+                audio: audioBuffer, 
+                mimetype: 'audio/mp4', 
+                ptt: false 
+            }, { quoted: message });
+        } catch (audioErr) {
+            console.error('Failed to download audio buffer:', audioErr);
+        }
 
         await delay(1000);
 
         // 4. Main Menu Text
-        const menuText = `🃏 *【 🤡 𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧! 🤡 】* 🃏
+        const menuText = `🃏 *【 🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡 】* 🃏
 
 🎭*𝙐𝙨𝙚𝙧:* ${message.pushName || 'User'}
 🤡*𝘽𝙤𝙩:* 𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧!🤡😈
 👑*𝙊𝙬𝙣𝙚𝙧:* 🦊⃟ᴠͥɪͣᴘͫ✮⃝🇧𝖎𝖌🇧ө͜͡ss𝄟⃝🎧™
+⏱️*𝙐𝙥𝙩𝙞𝙢𝙚:* ${uptimeStr}
+💾*𝙍𝘼𝙈:* ${ramUsage}
 
-┎━━━〔 🌐 *𝙂𝙀index.html𝙀𝙍𝘼𝙇* 〕━━━┈
+┎━━━〔 🌐 *𝙂𝙀𝙉𝙀𝙍𝘼𝙇* 〕━━━┈
 ┃ 🤡.help or .menu
 ┃🃏.ping
 ┃🤡.alive
@@ -71,11 +91,17 @@ async function helpCommand(sock, chatId, message) {
 ┃🔰.groupinfo
 ┃⚙.staff or .admins 
 ┃🤡.vv 
-+🎬.vv2
+┃🎬.vv2
 ┃🃏.trt <text> <lang>
 ┃📸.ss <link>
 ┃🤡.jid
 ┃📎.url
+┗━━━━━━━━━━━━━━┈
+
+┎━━━〔 📢 *𝘾𝙃𝘼𝙉𝙉𝙀𝙇* 〕━━━┈
+┃📢.newsletter <link>
+┃📌.channelinfo <link>
+┃🆔.getchannelid <link>
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━〔 👮‍♂️ *𝘼𝘿𝙈𝙄𝙉𝙎* 〕━━━┈
@@ -109,9 +135,10 @@ async function helpCommand(sock, chatId, message) {
 ┃🤡.mode <public/private>
 ┃🃏.clearsession
 ┃🤡.antidelete
-+🚫.antiviewonce
+┃🚫.antiviewonce
 ┃🃏.cleartmp
 ┃🤡.update
+┃⚙.setprofilename
 ┃⚙.settings
 ┃⚙.setpp <reply to image>
 ┃🎃.autoreact <on/off>
@@ -127,7 +154,7 @@ async function helpCommand(sock, chatId, message) {
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━━━━━━━━━━━━━
-*Image/Sticker Commands*
+┃🖼️ *Image/Sticker* ┃
 ┗━━━━━━━━━━━━━━┈
 ┎━━━━━━━━━━━━━━━
 ┃🤡.blur <image>
@@ -145,7 +172,7 @@ async function helpCommand(sock, chatId, message) {
 ┗━━━━━━━━━━━━━━┈ 
 
 ┎━━━━━━━━━━━━━━━
-┃*Pies Commands*         ┃
+┃🥧 *Pies Commands* ┃
 ┗━━━━━━━━━━━━━━┈
 ┎━━━━━━━━━━━━━━━
 ┃🤡.pies <country>
@@ -157,7 +184,7 @@ async function helpCommand(sock, chatId, message) {
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━━━━━━━━━━━━━
-┃🎮 *Game Commands*┃
+┃🎮 *Game Commands* ┃
 ┗━━━━━━━━━━━━━━┈
 ┎━━━━━━━━━━━━━━━
 ┃🤡.tictactoe @user
@@ -170,7 +197,7 @@ async function helpCommand(sock, chatId, message) {
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━━━━━━━━━━━━━
-┃🤖 *AI Commands*       ┃
+┃🤖 *AI Commands* ┃
 ┗━━━━━━━━━━━━━━┈
 ┎━━━━━━━━━━━━━━━
 ┃🤖.gpt <question>
@@ -181,7 +208,7 @@ async function helpCommand(sock, chatId, message) {
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━━━━━━━━━━━━━
-┃🎯 *Fun Commands*    ┃
+┃🎯 *Fun Commands* ┃
 ┗━━━━━━━━━━━━━━┈
 ┎━━━━━━━━━━━━━━━
 ┃🃏.compliment @user
@@ -198,7 +225,7 @@ async function helpCommand(sock, chatId, message) {
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━━━━━━━━━━━━━
-┃🔤 *Textmaker*              ┃
+┃🔤 *Textmaker* ┃
 ┗━━━━━━━━━━━━━━┈
 ┎━━━━━━━━━━━━━━━
 ┃🤡.metallic <text>
@@ -222,7 +249,7 @@ async function helpCommand(sock, chatId, message) {
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━━━━━━━━━━━━━
-┃📥 *Downloader*            ┃
+┃📥 *Downloader* ┃
 ┗━━━━━━━━━━━━━━┈
 ┎━━━━━━━━━━━━━━━
 ┃🎵.play <song_name>   
@@ -236,7 +263,7 @@ async function helpCommand(sock, chatId, message) {
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━━━━━━━━━━━━━
-┃🧩 *MISC*                       ┃
+┃🧩 *MISC* ┃
 ┗━━━━━━━━━━━━━━┈
 ┎━━━━━━━━━━━━━━━
 ┃❤.heart
@@ -258,7 +285,7 @@ async function helpCommand(sock, chatId, message) {
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━━━━━━━━━━━━━
-┃🖼️ *ANIME*                     ┃
+┃🖼️ *ANIME* ┃
 ┗━━━━━━━━━━━━━━┈
 ┎━━━━━━━━━━━━━━━
 ┃🤡.nom 
@@ -272,7 +299,7 @@ async function helpCommand(sock, chatId, message) {
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━━━━━━━━━━━━━
-┃💻 *Github Commands:*┃
+┃💻 *Github Commands:* ┃
 ┗━━━━━━━━━━━━━━┈
 ┎━━━━━━━━━━━━━━━━━
 ┃➤ .git
@@ -283,9 +310,9 @@ async function helpCommand(sock, chatId, message) {
 ┗━━━━━━━━━━━━━━┈
 
 👻💻ʛʜө͜͡st ɪ͜͡ŋ tʜɘ ɱɛ͜͡cʜɪ͜͡ŋɘ💻👻
-🤡 *𝙅𝙊k𝙀𝙍 𝙄𝙎 𝙒𝘼𝙏𝘾𝙃𝙄𝙉𝙂...*🤡\n\n*Join our channel for updates*!`;
+🤡 *𝙅𝙊𝙆𝙀𝙍 𝙄𝙎 𝙒𝘼𝙏𝘾𝙃𝙄𝙉𝙂...*🤡\n\n*Join our channel for updates!*`;
 
-        // 5. Send Image with Menu AND Attached Newsletter metadata
+        // 5. Send Image with Menu AND Attached Channel Context
         await sock.sendMessage(chatId, { 
             image: { url: randomImg }, 
             caption: menuText,
@@ -293,8 +320,8 @@ async function helpCommand(sock, chatId, message) {
                 forwardingScore: 1,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363428288475430@newsletter', // Updated JID
-                    newsletterName: '🤡𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧!🤡',
+                    newsletterJid: '120363428288475430@newsletter',
+                    newsletterName: '🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡',
                     serverMessageId: 111
                 }
             }

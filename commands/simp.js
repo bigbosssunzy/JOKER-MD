@@ -1,4 +1,21 @@
 const fetch = require('node-fetch');
+const settings = require('../settings'); // Import settings config
+
+// Dynamically generate the newsletter context info on each call
+function getChannelInfo() {
+    const currentBotName = global.botname || settings.botName || 'JOKER';
+    
+    return {
+        forwardingScore: 1,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: '120363428288475430@newsletter',
+            // Updates dynamically with decoration style wrappers matching your branding
+            newsletterName: `${currentBotName.toUpperCase()}`,
+            serverMessageId: -1
+        }
+    };
+}
 
 async function simpCommand(sock, chatId, quotedMsg, mentionedJid, sender) {
     try {
@@ -29,36 +46,20 @@ async function simpCommand(sock, chatId, quotedMsg, mentionedJid, sender) {
         // Get the image buffer
         const imageBuffer = await response.buffer();
 
-        // Send the image with caption
+        // Send the image with caption and dynamic channel info wrapper
         await sock.sendMessage(chatId, {
             image: imageBuffer,
             caption: '*your religion is simping*',
-            contextInfo: {
-                forwardingScore: 1,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363428288475430@newsletter',
-                    newsletterName: '🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡',
-                    serverMessageId: -1
-                }
-            }
+            contextInfo: getChannelInfo()
         });
 
     } catch (error) {
         console.error('Error in simp command:', error);
         await sock.sendMessage(chatId, { 
             text: '❌ Sorry, I couldn\'t generate the simp card. Please try again later!',
-            contextInfo: {
-                forwardingScore: 1,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363428288475430@newsletter',
-                    newsletterName: '🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡',
-                    serverMessageId: -1
-                }
-            }
+            contextInfo: getChannelInfo()
         });
     }
 }
 
-module.exports = { simpCommand }; 
+module.exports = { simpCommand };

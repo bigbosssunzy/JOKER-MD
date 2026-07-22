@@ -1,6 +1,23 @@
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const axios = require('axios');
 const sharp = require('sharp');
+const settings = require('../settings'); // Import settings config
+
+// Dynamically generate the newsletter context info on each call
+function getChannelInfo() {
+    const currentBotName = global.botname || settings.botName || 'JOKER';
+    
+    return {
+        forwardingScore: 1,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: '120363428288475430@newsletter',
+            // Updates dynamically with decoration style wrappers matching your branding
+            newsletterName: `${currentBotName.toUpperCase()}`,
+            serverMessageId: -1
+        }
+    };
+}
 
 async function blurCommand(sock, chatId, message, quotedMessage) {
     try {
@@ -57,19 +74,11 @@ async function blurCommand(sock, chatId, message, quotedMessage) {
             .blur(10) // Blur radius of 10
             .toBuffer();
 
-        // Send the blurred image
+        // Send the blurred image with dynamic channel info wrapper
         await sock.sendMessage(chatId, {
             image: blurredImage,
             caption: '*[ ✔ ] Image Blurred Successfully*',
-            contextInfo: {
-                forwardingScore: 1,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363428288475430@newsletter',
-                    newsletterName: '🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡',
-                    serverMessageId: -1
-                }
-            }
+            contextInfo: getChannelInfo()
         }, { quoted: message });
 
     } catch (error) {
@@ -80,4 +89,4 @@ async function blurCommand(sock, chatId, message, quotedMessage) {
     }
 }
 
-module.exports = blurCommand; 
+module.exports = blurCommand;

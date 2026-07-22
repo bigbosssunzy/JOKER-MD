@@ -6,6 +6,22 @@ const settings = require('../settings');
 const webp = require('node-webpmux');
 const crypto = require('crypto');
 
+// Dynamically generate the newsletter context info on each call
+function getChannelInfo() {
+    const currentBotName = global.botname || settings.botName || 'JOKER';
+    
+    return {
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: '120363428288475430@newsletter',
+            // Updates dynamically with decoration style wrappers matching your branding
+            newsletterName: `${currentBotName.toUpperCase()}`,
+            serverMessageId: -1
+        }
+    };
+}
+
 async function stickercropCommand(sock, chatId, message) {
     // The message that will be quoted in the reply.
     const messageToQuote = message;
@@ -32,15 +48,7 @@ async function stickercropCommand(sock, chatId, message) {
     if (!mediaMessage) {
         await sock.sendMessage(chatId, { 
             text: 'Please reply to an image/video/sticker with .crop, or send an image/video/sticker with .crop as the caption.',
-            contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363428288475430@newsletter',
-                    newsletterName: '🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡',
-                    serverMessageId: -1
-                }
-            }
+            contextInfo: getChannelInfo()
         },{ quoted: messageToQuote });
         return;
     }
@@ -54,15 +62,7 @@ async function stickercropCommand(sock, chatId, message) {
         if (!mediaBuffer) {
             await sock.sendMessage(chatId, { 
                 text: 'Failed to download media. Please try again.',
-                contextInfo: {
-                    forwardingScore: 999,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363428288475430@newsletter',
-                        newsletterName: '🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡',
-                        serverMessageId: -1
-                    }
-                }
+                contextInfo: getChannelInfo()
             });
             return;
         }
@@ -90,20 +90,15 @@ async function stickercropCommand(sock, chatId, message) {
         const isLargeFile = fileSizeKB > 5000; // 5MB threshold
 
         // Convert to WebP using ffmpeg with crop to square
-        // For videos: more aggressive compression, lower quality, shorter duration
-        // For images: standard compression
         let ffmpegCommand;
         
         if (isAnimated) {
             if (isLargeFile) {
-                // Large video: very aggressive compression, max 2 seconds, very low quality
                 ffmpegCommand = `ffmpeg -i "${tempInput}" -t 2 -vf "crop=min(iw\\,ih):min(iw\\,ih),scale=512:512,fps=8" -c:v libwebp -preset default -loop 0 -vsync 0 -pix_fmt yuva420p -quality 30 -compression_level 6 -b:v 100k -max_muxing_queue_size 1024 "${tempOutput}"`;
             } else {
-                // Normal video: aggressive compression, max 3 seconds, lower quality
                 ffmpegCommand = `ffmpeg -i "${tempInput}" -t 3 -vf "crop=min(iw\\,ih):min(iw\\,ih),scale=512:512,fps=12" -c:v libwebp -preset default -loop 0 -vsync 0 -pix_fmt yuva420p -quality 50 -compression_level 6 -b:v 150k -max_muxing_queue_size 1024 "${tempOutput}"`;
             }
         } else {
-            // Image: standard compression
             ffmpegCommand = `ffmpeg -i "${tempInput}" -vf "crop=min(iw\\,ih):min(iw\\,ih),scale=512:512,format=rgba" -c:v libwebp -preset default -loop 0 -vsync 0 -pix_fmt yuva420p -quality 75 -compression_level 6 "${tempOutput}"`;
         }
 
@@ -137,8 +132,7 @@ async function stickercropCommand(sock, chatId, message) {
         const finalSizeKB = webpBuffer.length / 1024;
         console.log(`Final sticker size: ${Math.round(finalSizeKB)} KB`);
         
-        // If still too large, we'll send it anyway but log a warning
-        if (finalSizeKB > 1000) { // 1MB limit for WhatsApp stickers
+        if (finalSizeKB > 1000) { 
             console.log(`⚠️ Warning: Sticker size (${Math.round(finalSizeKB)} KB) exceeds recommended limit but will be sent anyway`);
         }
 
@@ -182,20 +176,10 @@ async function stickercropCommand(sock, chatId, message) {
         console.error('Error in stickercrop command:', error);
         await sock.sendMessage(chatId, { 
             text: 'Failed to crop sticker! Try with an image.',
-            contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363428288475430@newsletter',
-                    newsletterName: '🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡',
-                    serverMessageId: -1
-                }
-            }
+            contextInfo: getChannelInfo()
         });
     }
 }
-
-module.exports = stickercropCommand;
 
 // Helper: convert a raw media buffer to a cropped sticker using same pipeline
 async function stickercropFromBuffer(inputBuffer, isAnimated) {
@@ -207,7 +191,6 @@ async function stickercropFromBuffer(inputBuffer, isAnimated) {
 
     fs.writeFileSync(tempInput, inputBuffer);
 
-    // Size-based trim like stickercrop
     const fileSizeKB = inputBuffer.length / 1024;
     const isLargeFile = fileSizeKB > 5000;
 
@@ -253,4 +236,5 @@ async function stickercropFromBuffer(inputBuffer, isAnimated) {
     return finalBuffer;
 }
 
+module.exports = stickercropCommand;
 module.exports.stickercropFromBuffer = stickercropFromBuffer;
