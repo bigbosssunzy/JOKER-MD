@@ -13,7 +13,7 @@ function getChannelInfo() {
             forwardingScore: 1,
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
-                newsletterJid: '120363430052546986@newsletter',
+                newsletterJid: '120363428288475430@newsletter',
                 // Updates dynamically with decoration style wrappers matching your branding
                 newsletterName: `${currentBotName.toUpperCase()}`,
                 serverMessageId: -1
