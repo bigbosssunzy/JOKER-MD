@@ -69,7 +69,7 @@ async function helpCommand(sock, chatId, message) {
         const menuText = `🃏 *【 🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡 】* 🃏
 
 🎭*𝙐𝙨𝙚𝙧:* ${message.pushName || 'User'}
-🤡*𝘽𝙤𝙩:* 𝙄 𝙖𝙢 𝙟𝙤𝙠𝙚𝙧!🤡😈
+🤡*𝘽𝙤𝙩: `JOKER-MD`
 👑*𝙊𝙬𝙣𝙚𝙧:* 🦊⃟ᴠͥɪͣᴘͫ✮⃝🇧𝖎𝖌🇧ө͜͡ss𝄟⃝🎧™
 ⏱️*𝙐𝙥𝙩𝙞𝙢𝙚:* ${uptimeStr}
 💾*𝙍𝘼𝙈:* ${ramUsage}
@@ -96,6 +96,8 @@ async function helpCommand(sock, chatId, message) {
 ┃📸.ss <link>
 ┃🤡.jid
 ┃📎.url
+┃🃏.xvideo
+┃🃏.google
 ┗━━━━━━━━━━━━━━┈
 
 ┎━━━〔 📢 *𝘾𝙃𝘼𝙉𝙉𝙀𝙇* 〕━━━┈
@@ -255,6 +257,7 @@ async function helpCommand(sock, chatId, message) {
 ┃🎵.play <song_name>   
 ┃🎶.song <song_name> 
 ┃🎧.spotify <query>
+┃🎵.shazam (reply to audio/video)
 ┃💽.instagram <link>
 ┃📎.facebook <link>
 ┃🎬.tiktok <link>
