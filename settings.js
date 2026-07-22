@@ -4,7 +4,7 @@ const settings = {
   author: '‎',
   botName: "🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡",
   botOwner: '🦊⃟ᴠͥɪͣᴘͫ✮⃝🇧𝖎𝖌🇧ө͜͡ss𝄟⃝🎧™',
-  ownerNumber: '234708605769',
+  ownerNumber: '2347086057694',
   giphyApiKey: 'qnl7ssQChTdPjsKta2Ax2LMaGXz303tq',
   commandMode: "public",
   maxStoreMessages: 20, 
