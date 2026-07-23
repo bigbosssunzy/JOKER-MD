@@ -140,6 +140,7 @@ async function helpCommand(sock, chatId, message) {
 ┃🎃.autoreact <on/off>
 ┃✅.autoread <on/off>
 ┃✨.autostatus <on/off>
+┃📥.autostatus save <on/off>
 ┃🎈.autostatus react <on/off>
 ┃💻.autotyping <on/off>
 ┃🃏.clearsession

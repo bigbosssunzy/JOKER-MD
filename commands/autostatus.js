@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const isOwnerOrSudo = require('../lib/isOwner');
 const settings = require('../settings'); // Import settings config
 
@@ -35,7 +36,8 @@ if (!fs.existsSync(configPath)) {
     fs.writeFileSync(configPath, JSON.stringify({ 
         enabled: false, 
         reactOn: false,
-        reaction: '💚' 
+        reaction: '💚',
+        autosave: false 
     }, null, 2));
 }
 
@@ -59,10 +61,11 @@ async function autoStatusCommand(sock, chatId, msg, args) {
         if (!args || args.length === 0) {
             const status = config.enabled ? 'enabled' : 'disabled';
             const reactStatus = config.reactOn ? 'enabled' : 'disabled';
+            const saveStatus = config.autosave ? 'enabled' : 'disabled';
             const currentReaction = config.reaction || '💚';
             
             await sock.sendMessage(chatId, { 
-                text: `🔄 *Auto Status Settings*\n\n📱 *Auto Status View:* ${status}\n💫 *Status Reactions:* ${reactStatus}\n😀 *Reaction Emoji:* ${currentReaction}\n\n*Commands:*\n.autostatus on - Enable auto status view\n.autostatus off - Disable auto status view\n.autostatus react on - Enable status reactions\n.autostatus react off - Disable status reactions\n.autostatus reaction <emoji> - Change reaction emoji`,
+                text: `🔄 *Auto Status Settings*\n\n📱 *Auto Status View:* ${status}\n💫 *Status Reactions:* ${reactStatus}\n📥 *Status Auto-Save:* ${saveStatus}\n😀 *Reaction Emoji:* ${currentReaction}\n\n*Commands:*\n.autostatus on/off - Enable/disable auto status view\n.autostatus react on/off - Enable/disable status reactions\n.autostatus save on/off - Enable/disable status auto-save on reply\n.autostatus reaction <emoji> - Change reaction emoji`,
                 ...getChannelInfo()
             });
             return;
@@ -116,6 +119,37 @@ async function autoStatusCommand(sock, chatId, msg, args) {
                     ...getChannelInfo()
                 });
             }
+        } else if (command === 'save') {
+            // Handle status reply save subcommand
+            if (!args[1]) {
+                await sock.sendMessage(chatId, { 
+                    text: `❌ Please specify on/off for auto-save!\nCurrent status saver: ${config.autosave ? 'enabled' : 'disabled'}\nUse: .autostatus save on/off`,
+                    ...getChannelInfo()
+                });
+                return;
+            }
+
+            const saveCommand = args[1].toLowerCase();
+            if (saveCommand === 'on') {
+                config.autosave = true;
+                fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+                await sock.sendMessage(chatId, { 
+                    text: '✅ Status auto-save has been enabled!\nReply to any status with any word to save it to your bot number.',
+                    ...getChannelInfo()
+                });
+            } else if (saveCommand === 'off') {
+                config.autosave = false;
+                fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+                await sock.sendMessage(chatId, { 
+                    text: '❌ Status auto-save has been disabled!',
+                    ...getChannelInfo()
+                });
+            } else {
+                await sock.sendMessage(chatId, { 
+                    text: '❌ Invalid command! Use: .autostatus save on/off',
+                    ...getChannelInfo()
+                });
+            }
         } else if (command === 'reaction') {
             // Handle custom emoji reaction configuration
             const emoji = args[1]?.trim();
@@ -135,7 +169,7 @@ async function autoStatusCommand(sock, chatId, msg, args) {
             });
         } else {
             await sock.sendMessage(chatId, { 
-                text: '❌ Invalid command! Use:\n.autostatus on/off - Enable/disable auto status view\n.autostatus react on/off - Enable/disable status reactions\n.autostatus reaction <emoji> - Change reaction emoji',
+                text: '❌ Invalid command! Use:\n.autostatus on/off - Enable/disable auto status view\n.autostatus react on/off - Enable/disable status reactions\n.autostatus save on/off - Enable/disable status auto-save\n.autostatus reaction <emoji> - Change reaction emoji',
                 ...getChannelInfo()
             });
         }
@@ -191,13 +225,10 @@ async function reactToStatus(sock, statusKey) {
         const reactionEmoji = getStatusReaction();
         const participantJid = statusKey.participant || statusKey.remoteJid;
 
-        // Ensure we have a valid individual user JID, not 'status@broadcast'
         if (!participantJid || participantJid === 'status@broadcast') {
-            console.log('❌ Cannot react: Missing valid participant JID for status.');
             return;
         }
 
-        // Use Baileys native sendMessage with react and statusJidList
         await sock.sendMessage(
             'status@broadcast',
             {
@@ -215,10 +246,57 @@ async function reactToStatus(sock, statusKey) {
                 statusJidList: [participantJid]
             }
         );
-        
-        console.log(`✅ Successfully reacted to status with ${reactionEmoji}`);
     } catch (error) {
         console.error('❌ Error reacting to status:', error.message);
+    }
+}
+
+// Function to handle status replies (auto-save and send directly to bot's own number)
+async function handleStatusReply(sock, msg) {
+    try {
+        let config;
+        try {
+            config = JSON.parse(fs.readFileSync(configPath));
+        } catch (e) {
+            return;
+        }
+
+        if (!config.autosave) return;
+
+        const contextInfo = msg.message?.extendedTextMessage?.contextInfo;
+        if (!contextInfo || contextInfo.remoteJid !== 'status@broadcast') return;
+
+        const quotedMessage = contextInfo.quotedMessage;
+        if (!quotedMessage) return;
+
+        // Target the bot's own number (Message Yourself / Saved Messages chat)
+        const botNumberJid = sock.user?.id ? sock.user.id.split(':')[0] + '@s.whatsapp.net' : msg.key.remoteJid;
+
+        if (quotedMessage.imageMessage) {
+            const stream = await downloadMediaMessage({ message: quotedMessage }, 'buffer', {}, { logger: console });
+            const caption = quotedMessage.imageMessage.caption || '';
+            await sock.sendMessage(botNumberJid, {
+                image: stream,
+                caption: caption,
+                ...getChannelInfo()
+            });
+        } else if (quotedMessage.videoMessage) {
+            const stream = await downloadMediaMessage({ message: quotedMessage }, 'buffer', {}, { logger: console });
+            const caption = quotedMessage.videoMessage.caption || '';
+            await sock.sendMessage(botNumberJid, {
+                video: stream,
+                caption: caption,
+                ...getChannelInfo()
+            });
+        } else if (quotedMessage.conversation || quotedMessage.extendedTextMessage) {
+            const textContent = quotedMessage.conversation || quotedMessage.extendedTextMessage?.text || '';
+            await sock.sendMessage(botNumberJid, {
+                text: `📥 *Saved Status:*\n\n${textContent}`,
+                ...getChannelInfo()
+            });
+        }
+    } catch (error) {
+        console.error('❌ Error in status reply auto-save:', error.message);
     }
 }
 
@@ -229,10 +307,8 @@ async function handleStatusUpdate(sock, status) {
             return;
         }
 
-        // Add delay to prevent rate limiting
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // Handle status from messages.upsert
         if (status.messages && status.messages.length > 0) {
             const msg = status.messages[0];
             if (msg.key && msg.key.remoteJid === 'status@broadcast') {
@@ -241,7 +317,6 @@ async function handleStatusUpdate(sock, status) {
                     await reactToStatus(sock, msg.key);
                 } catch (err) {
                     if (err.message?.includes('rate-overlimit')) {
-                        console.log('⚠️ Rate limit hit, waiting before retrying...');
                         await new Promise(resolve => setTimeout(resolve, 2000));
                         await sock.readMessages([msg.key]);
                         await reactToStatus(sock, msg.key);
@@ -253,14 +328,12 @@ async function handleStatusUpdate(sock, status) {
             }
         }
 
-        // Handle direct status updates
         if (status.key && status.key.remoteJid === 'status@broadcast') {
             try {
                 await sock.readMessages([status.key]);
                 await reactToStatus(sock, status.key);
             } catch (err) {
                 if (err.message?.includes('rate-overlimit')) {
-                    console.log('⚠️ Rate limit hit, waiting before retrying...');
                     await new Promise(resolve => setTimeout(resolve, 2000));
                     await sock.readMessages([status.key]);
                     await reactToStatus(sock, status.key);
@@ -271,14 +344,12 @@ async function handleStatusUpdate(sock, status) {
             return;
         }
 
-        // Handle status in reactions
         if (status.reaction && status.reaction.key.remoteJid === 'status@broadcast') {
             try {
                 await sock.readMessages([status.reaction.key]);
                 await reactToStatus(sock, status.reaction.key);
             } catch (err) {
                 if (err.message?.includes('rate-overlimit')) {
-                    console.log('⚠️ Rate limit hit, waiting before retrying...');
                     await new Promise(resolve => setTimeout(resolve, 2000));
                     await sock.readMessages([status.reaction.key]);
                     await reactToStatus(sock, status.reaction.key);
@@ -297,6 +368,7 @@ async function handleStatusUpdate(sock, status) {
 module.exports = {
     autoStatusCommand,
     handleStatusUpdate,
+    handleStatusReply,
     isAutoStatusEnabled,
     isStatusReactionEnabled,
     reactToStatus
