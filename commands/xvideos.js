@@ -106,30 +106,28 @@ async function xvideosCommand(sock, chatId, message, args, senderId) {
             results: topResults
         });
 
-        let menuText = `🔞 *【 XVIDEOS SEARCH RESULTS 】*\n`;
-        menuText += `🔍 *Query:* ${query}\n`;
-        menuText += `📄 *Page:* ${page + 1}\n\n`;
-
-        topResults.forEach((item, index) => {
-            menuText += `*${index + 1}.* ${item.title}\n`;
-            menuText += `   ⏱️ *Duration:* ${item.duration || 'N/A'}\n\n`;
-        });
-
-        menuText += `───────────────\n`;
-        menuText += `📥 *To download:* Type \`*xvdl <1-10>\`\n`;
-        menuText += `➡️ *Next page:* Type \`*xv ${query} p${page + 2}\`\n`;
-        menuText += `🤡 *JOKER BOT*`;
-
         await sock.sendMessage(chatId, { react: { text: '✅', key: message.key } });
 
-        const firstThumb = topResults[0]?.thumb;
-        if (firstThumb) {
-            await sock.sendMessage(chatId, { 
-                image: { url: firstThumb }, 
-                caption: menuText 
-            }, { quoted: message });
-        } else {
-            await sock.sendMessage(chatId, { text: menuText }, { quoted: message });
+        // Loop through results and send an image card for each video with its own caption & number
+        for (let index = 0; index < topResults.length; index++) {
+            const item = topResults[index];
+            const itemCaption = `🔞 *【 XVIDEOS RESULT (${index + 1}/10) 】*\n\n` +
+                                `📌 *Title:* ${item.title}\n` +
+                                `⏱️ *Duration:* ${item.duration || 'N/A'}\n\n` +
+                                `📥 *To download:* Type \`*xvdl ${index + 1}\`\n` +
+                                `🤡 *JOKER BOT*`;
+
+            if (item.thumb) {
+                await sock.sendMessage(chatId, { 
+                    image: { url: item.thumb }, 
+                    caption: itemCaption 
+                });
+            } else {
+                await sock.sendMessage(chatId, { text: itemCaption });
+            }
+
+            // Brief delay between messages to maintain order and prevent spam rate-limits
+            await new Promise(resolve => setTimeout(resolve, 400));
         }
 
     } catch (err) {
