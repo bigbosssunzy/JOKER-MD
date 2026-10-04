@@ -1,114 +1,90 @@
 const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
 
 async function songCommand(sock, chatId, message) {
-    let tempFilePath = null;
     try {
-        const text = message.message?.conversation 
-            || message.message?.extendedTextMessage?.text 
-            || message.text 
-            || '';
-
-        const searchQuery = text.split(' ').slice(1).join(' ').trim();
+        const text = message.message?.conversation || message.message?.extendedTextMessage?.text || '';
         
+        // Cleanly strip out .song, .play, /song, /play, !song, or !play prefixes
+        const searchQuery = text.replace(/^[\.\/\\!]?\s*(song|play)\s*/i, '').trim();
+
         if (!searchQuery) {
             return await sock.sendMessage(chatId, { 
-                text: "❌ Please provide a song name!\n\n*Example:* `.play London view by bm`"
+                text: "What song do you want to download?\n*Example:* `.song London view by bm`"
             }, { quoted: message });
         }
 
-        // Send initial searching notification
-        await sock.sendMessage(chatId, {
-            text: `🔎 *Searching and processing:* _"${searchQuery}"_\n_Please wait..._`
-        }, { quoted: message });
+        const API_URL = 'https://knightbotapi.stream/api/ytmp3';
+        
+        console.log(`[SONG COMMAND] Clean Query: "${searchQuery}"`);
 
-        // 1. Call API with a higher timeout (60s) to allow YouTube parsing
-        const apiUrl = `https://apis.davidcyril.name.ng/play?query=${encodeURIComponent(searchQuery)}`;
-        const { data } = await axios.get(apiUrl, { 
-            timeout: 60000,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
+        // Fetch song details and download URL from KnightBot API
+        const response = await axios.get(API_URL, {
+            params: {
+                apikey: 'knight',
+                query: searchQuery
+            },
+            timeout: 120000
         });
 
-        if (!data || !data.status || !data.result || !data.result.download_url) {
-            return await sock.sendMessage(chatId, { 
-                text: "❌ Download server is currently unreachable or could not find the song."
-            }, { quoted: message });
+        const data = response.data;
+
+        if (!data || !data.success || !data.download) {
+            throw new Error('API response did not return a valid download link');
         }
 
-        const song = data.result;
-        const downloadUrl = song.download_url;
-        const title = song.title || searchQuery;
+        const title = data.title || searchQuery;
+        const downloadUrl = data.download;
+        const thumbnailUrl = data.thumbnail;
 
-        // 2. Send image thumbnail with song information
-        if (song.thumbnail) {
+        const captionText = `🎵 Searching and processing: *"${title}"*...\n_Please wait, downloading audio..._`;
+
+        // Send thumbnail image together with the processing message
+        if (thumbnailUrl) {
             await sock.sendMessage(chatId, {
-                image: { url: song.thumbnail },
-                caption: `🎵 Downloading: *${title}*\n⏱ Duration: ${song.duration || 'N/A'}`
+                image: { url: thumbnailUrl },
+                caption: captionText
             }, { quoted: message });
+        } else {
+            await sock.sendMessage(chatId, { text: captionText }, { quoted: message });
         }
 
-        // 3. Save directly to disk stream with 120s timeout
-        const safeFilename = title.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 40);
-        tempFilePath = path.join(os.tmpdir(), `song_${Date.now()}_${safeFilename}.mp3`);
+        console.log(`[SONG COMMAND] Fetching MP3 buffer from: ${downloadUrl}`);
 
-        const writer = fs.createWriteStream(tempFilePath);
-        const response = await axios({
-            url: downloadUrl,
-            method: 'GET',
-            responseType: 'stream',
-            timeout: 120000, // 2 minutes for slow stream transfers
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
+        // Fetch the generated MP3 file
+        const audioResponse = await axios.get(downloadUrl, {
+            responseType: 'arraybuffer',
+            timeout: 90000
         });
 
-        response.data.pipe(writer);
+        const audioBuffer = Buffer.from(audioResponse.data);
 
-        await new Promise((resolve, reject) => {
-            writer.on('finish', resolve);
-            writer.on('error', reject);
-        });
+        if (!audioBuffer || audioBuffer.length === 0) {
+            throw new Error('Downloaded audio buffer is empty.');
+        }
 
-        // 4. Send audio file
+        const cleanTitle = title.replace(/[^\w\s-]/g, '');
+
+        // Send MP3 to WhatsApp chat
         await sock.sendMessage(chatId, {
-            audio: { url: tempFilePath },
-            mimetype: 'audio/mpeg',
-            fileName: `${title.replace(/[^\w\s-]/g, '')}.mp3`,
-            ptt: false,
-            contextInfo: {
-                externalAdReply: {
-                    title: title,
-                    body: `Duration: ${song.duration || 'N/A'}`,
-                    thumbnailUrl: song.thumbnail,
-                    sourceUrl: song.video_url || 'https://youtube.com',
-                    mediaType: 1,
-                    renderLargerThumbnail: true
-                }
-            }
+            audio: audioBuffer,
+            mimetype: 'audio/mp4',
+            fileName: `${cleanTitle}.mp3`,
+            ptt: false
         }, { quoted: message });
 
-    } catch (error) {
-        console.error('Song command execution error:', error?.message || error);
-
-        let errorMessage = "❌ Unable to process song request at this moment.";
-        if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
-            errorMessage = "❌ The server took too long to fetch the song. Please try again in a few seconds.";
+    } catch (err) {
+        if (err.response) {
+            console.error(`[SONG COMMAND ERROR] Status: ${err.response.status} | URL: ${err.config?.url}`);
+        } else {
+            console.error('[SONG COMMAND ERROR]:', err.message);
         }
 
-        await sock.sendMessage(chatId, { 
-            text: errorMessage
-        }, { quoted: message });
-    } finally {
-        // Clean up temp file
-        if (tempFilePath && fs.existsSync(tempFilePath)) {
-            try {
-                fs.unlinkSync(tempFilePath);
-            } catch (err) {}
+        let errorMessage = '❌ Failed to download song. Please try again later.';
+        if (err.response?.status === 404) {
+            errorMessage = '❌ Route or file not found (404). Check API endpoint status.';
         }
+
+        await sock.sendMessage(chatId, { text: errorMessage }, { quoted: message });
     }
 }
 
