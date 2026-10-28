@@ -1,10 +1,10 @@
 const settings = {
   prefix: ".", // 👈 This stays as a property inside the object
-  packname: '🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡',
+  packname: '🤡🃏 THE ONE 🃏🤡',
   author: '‎',
-  botName: "🤡🃏𝐈 𝐀𝐌 𝐉𝐎𝐊𝐄𝐑🃏🤡",
-  botOwner: '🦊⃟ᴠͥɪͣᴘͫ✮⃝🇧𝖎𝖌🇧ө͜͡ss𝄟⃝🎧™',
-  ownerNumber: '234708605769',
+  botName: "🤡🃏𝐈 𝐀𝐌 THE ONE 🃏🤡",
+  botOwner: 'THE ONE™',
+  ownerNumber: '256706559492',
   giphyApiKey: 'qnl7ssQChTdPjsKta2Ax2LMaGXz303tq',
   commandMode: "public",
   maxStoreMessages: 20, 
